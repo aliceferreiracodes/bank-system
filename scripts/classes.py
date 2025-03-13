@@ -1,4 +1,8 @@
 from abc import abstractmethod
+from datetime import datetime, timedelta
+
+# establish limit of 10 daily transactions per account
+# show date and time of transactions in history
 
 class History:
 
@@ -135,9 +139,9 @@ class Account():
 
 class CheckingAccount(Account):
 
-    def __init__(self, balance: float, customer_cpf: str, dayly_limit, withdraw_limit, history=None):
-        self._dayly_limit = dayly_limit
+    def __init__(self, balance: float, customer_cpf: str, withdraw_limit, history=None):
         self._withdraw_limit = withdraw_limit
+        self._daily_limit = 10
         self._num_withdraw = 0
 
         if history is None:
@@ -151,12 +155,12 @@ class CheckingAccount(Account):
 Number: {self._number}
 Balance: {self._balance}
 Customer: {self._customer_cpf}
-Dayly limit: {self._dayly_limit}
+Daily limit: {self._daily_limit}
 Withdraw limit: {self._withdraw_limit}'''
     
 
     def withdraw(self, value: float):
-        if self._num_withdraw >= self._dayly_limit:
+        if self._num_withdraw >= self._daily_limit:
             print("Withdrawal unavailable: you reached you daily limit.")
             return
         
@@ -169,7 +173,7 @@ Withdraw limit: {self._withdraw_limit}'''
             return
         
         self._balance -= value
-        self._history.add_transaction(f"Withdrawal: R$ {value:.2f}")
+        self._history.add_transaction(f"Withdrawal: R$ {value:.2f} at {datetime.now()}")
 
 
 
@@ -179,4 +183,4 @@ Withdraw limit: {self._withdraw_limit}'''
             return
     
         self._balance += value
-        self._history.add_transaction(f"Deposit: R$ {value:.2f}")
+        self._history.add_transaction(f"Deposit: R$ {value:.2f} at {datetime.now()}")

@@ -1,2 +1,5 @@
 # ignore test file
 /scripts/test.py
+
+# ignore pycache
+/scripts/__pycache__

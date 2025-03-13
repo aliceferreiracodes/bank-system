@@ -6,11 +6,11 @@ customer1 = NaturalPerson("12345678901", "Link", "29/11/2003", "Kokiri Forest")
 customer2 = NaturalPerson("98765432109", "Zelda", "12/04/2003", "Hyrule Castle")
 
 # account creation
-account1 = CheckingAccount(balance=1000.00, customer_cpf="12345678901", withdraw_limit=1000.00, dayly_limit=5)
-account2 = CheckingAccount(balance=2000.00, customer_cpf="12345678901", withdraw_limit=2000.00, dayly_limit=10)
+account1 = CheckingAccount(balance=1000.00, customer_cpf="12345678901", withdraw_limit=1000.00)
+account2 = CheckingAccount(balance=2000.00, customer_cpf="12345678901", withdraw_limit=2000.00)
 
-account3 = CheckingAccount(balance=1250.00, customer_cpf="98765432109", withdraw_limit=1500.00, dayly_limit=8)
-account4 = CheckingAccount(balance=3500.00, customer_cpf="98765432109", withdraw_limit=2500.00, dayly_limit=15)
+account3 = CheckingAccount(balance=1250.00, customer_cpf="98765432109", withdraw_limit=1500.00)
+account4 = CheckingAccount(balance=3500.00, customer_cpf="98765432109", withdraw_limit=2500.00)
 
 # customer display
 print("\nCUSTOMERS:")

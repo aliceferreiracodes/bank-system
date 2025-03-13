@@ -1,8 +1,5 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
-
-# establish limit of 10 daily transactions per account
-# show date and time of transactions in history
 
 class History:
 
@@ -24,7 +21,7 @@ class History:
 
 
 
-class Customer:
+class Customer(ABC):
 
     customers = []
 
@@ -87,10 +84,14 @@ CPF: {self._cpf}
 Birth date: {self._birth_date}
 Address: {self._address}
 Accounts: {self.get_accounts()}'''
+    
+    @property
+    def cpf(self):
+        return self._cpf
         
 
 
-class Account():
+class Account(ABC):
 
     accounts = []
 
@@ -104,7 +105,9 @@ class Account():
         self._balance = balance
         self._agency = "0001"
         self._customer_cpf = customer_cpf
-        self._history = history
+        self.history = history
+        self._num_transactions = 0
+        self._last_transaction_time = None
         self._customer = NaturalPerson.find_customer(customer_cpf)
         self._number = self._customer.add_account(self)
 
@@ -142,7 +145,6 @@ class CheckingAccount(Account):
     def __init__(self, balance: float, customer_cpf: str, withdraw_limit, history=None):
         self._withdraw_limit = withdraw_limit
         self._daily_limit = 10
-        self._num_withdraw = 0
 
         if history is None:
             history = History()
@@ -160,8 +162,12 @@ Withdraw limit: {self._withdraw_limit}'''
     
 
     def withdraw(self, value: float):
-        if self._num_withdraw >= self._daily_limit:
-            print("Withdrawal unavailable: you reached you daily limit.")
+        current_time = datetime.now()
+
+        if self._last_transaction_time is None:
+            self._last_transaction_time = current_time
+
+        if not self.transaction_available(current_time):
             return
         
         if value > self._withdraw_limit:
@@ -173,14 +179,39 @@ Withdraw limit: {self._withdraw_limit}'''
             return
         
         self._balance -= value
-        self._history.add_transaction(f"Withdrawal: R$ {value:.2f} at {datetime.now()}")
+        self._num_transactions += 1
+        self.history.add_transaction(f"Withdrawal: R$ {value:.2f} at {current_time}")
+
+        if self._num_transactions == 1:
+            self._last_transaction_time = current_time
 
 
 
     def deposit(self, value: float):
+        current_time = datetime.now()
+
+        if not self.transaction_available(current_time):
+            return
+
         if value <= 0:
             print("\nYou can't deposit non-positive values.")
             return
     
         self._balance += value
-        self._history.add_transaction(f"Deposit: R$ {value:.2f} at {datetime.now()}")
+        self._num_transactions += 1
+        self.history.add_transaction(f"Deposit: R$ {value:.2f} at {current_time}")
+
+        if self._num_transactions == 1:
+            self._last_transaction_time = current_time
+
+
+    def transaction_available(self, current_time):
+        if self._num_transactions >= self._daily_limit:
+            if current_time - self._last_transaction_time >= timedelta(hours=24):
+                print("\n24 hours passed. Resetting transaction count.\n")
+                self._num_transactions = 0
+                self._last_transaction_time = current_time
+                return True
+            else:
+                print("Deposit unavailable: you reached you daily limit.")
+                return False

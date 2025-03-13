@@ -1,65 +1,191 @@
 from time import sleep
 from classes import *
 
-# customer creation
-customer1 = NaturalPerson("12345678901", "Link", "29/11/2003", "Kokiri Forest")
-customer2 = NaturalPerson("98765432109", "Zelda", "12/04/2003", "Hyrule Castle")
+def main():
+    while True:
+        print('''
+    Choose an action:
+    [1] Register
+    [2] Create account
+    [3] Withdraw
+    [4] Deposit
+    [5] View statement
+    [6] View user information
+    [7] View account information
+    [8] Quit
 
-# account creation
-account1 = CheckingAccount(balance=1000.00, customer_cpf="12345678901", withdraw_limit=1000.00)
-account2 = CheckingAccount(balance=2000.00, customer_cpf="12345678901", withdraw_limit=2000.00)
+    Insert the number that corresponds to the desired action:
+    ''', end="")
 
-account3 = CheckingAccount(balance=1250.00, customer_cpf="98765432109", withdraw_limit=1500.00)
-account4 = CheckingAccount(balance=3500.00, customer_cpf="98765432109", withdraw_limit=2500.00)
+        while True:
+            try: 
+                option = int(input("-> "))
+                if not (option >= 1 and option <= 8):
+                    print("Please, enter a valid option.")
+                else:
+                    break
+            except ValueError:
+                print("Please, enter a number.")
 
-# customer display
-print("\nCUSTOMERS:")
-Customer.display_customers()
-sleep(5)
+        match option:
+            case 1: # register
+                customer_creation()
+            case 2: # create account
+                account_creation()
+            case 3: # withdraw
+                withdraw_operation()
+            case 4: # deposit
+                deposit_operation()
+            case 5: # view statement
+                display_statement()
+            case 6: # view user info
+                Customer.display_customers()
+            case 7: # view account info
+                Account.display_accounts()
+            case 8: # quit
+                print("\nBye!\n")
+                break
 
-# balance display
-print("\nBALANCE:\n")
-print(account1.balance)
-print(account2.balance)
-print(account3.balance)
-print(account4.balance)
-sleep(5)
+    
+def customer_creation():
+    cpf = ""
+    name = ""
+    birth_date = ""
+    address = ""
 
-# deposit
-account1.deposit(150.00)
-account2.deposit(1000.00)
-account3.deposit(50.00)
-account4.deposit(700.00)
-print("\nBALANCE - deposit:\n")
-print(f"+R$ 150.00 -> {account1.balance}")
-print(f"+R$ 1000.00 -> {account2.balance}")
-print(f"+R$ 50.00 -> {account3.balance}")
-print(f"+R$ 700.00 -> {account4.balance}")
-sleep(5)
+    while True:
+        valid_cpf = True
+        cpf = input("\nEnter your 11-digit CPF: ")
+        for customer in Customer.customers:
+            if cpf == customer.cpf:
+                print("\nThis CPF has already been registered.")
+                valid_cpf = False
 
-# withdrawal
-account1.withdraw(200.00)
-account2.withdraw(475.00)
-account3.withdraw(450.00)
-account4.withdraw(750.00)
-print("\nBALANCE - withdrawal:\n")
-print(f"-R$ 200.00 -> {account1.balance}")
-print(f"-R$ 475.00 -> {account2.balance}")
-print(f"-R$ 450.00 -> {account3.balance}")
-print(f"-R$ 750.00 -> {account4.balance}")
-sleep(5)
+        if not(len(cpf) == 11 and cpf.isnumeric):
+            print("\nEnter a valid CPF.")
+            valid_cpf = False
+        
+        if valid_cpf:
+            break
 
-# display accounts info
-print("\nACCOUNTS INFO:")
-Account.display_accounts()
-sleep(5)
+    name = input("\nEnter your name: ")
 
-# display transactions
-print("\nTRANSACTIONS:\n")
-account1._history.display_transactions()
-print()
-account2._history.display_transactions()
-print()
-account3._history.display_transactions()
-print()
-account4._history.display_transactions()
+    while True:
+        birth_date_str = input("\nEnter your birth date (DD-MM-YYYY): ")
+        try:
+            birth_date = datetime.strptime(birth_date_str, "%d-%m-%Y")
+            break
+        except ValueError:
+            print("\nInvalid date format. Please enter the date in DD-MM-YYYY format.")
+
+    address = input("\nEnter your address (Street - Number - City - State): ")
+
+    new_customer = NaturalPerson(cpf, name, birth_date, address)
+    print(new_customer.get_info())
+
+    
+def account_creation():
+    customer_exists = False
+    balance = 0
+    customer_cpf = ""
+    withdraw_limit = 0
+
+    customer_cpf = input("\nEnter the CPF this account will be vinculated to: ")
+    for customer in Customer.customers:
+            if customer_cpf == customer.cpf:
+                customer_exists = True
+
+    if not customer_exists:
+        print("\nUnable to vinculate account to this CPF, because it is not yet registered.")
+        return
+
+    while True:
+        try:
+            balance = float(input("\nEnter the account's current balance: "))
+            break
+        except ValueError:
+            print("\nEnter a number.")
+
+    while True:
+        try:
+            withdraw_limit = float(input("\nEnter the account's withdraw limit: "))
+            break
+        except ValueError:
+            print("\nEnter a number.")
+
+    new_account = CheckingAccount(balance, customer_cpf, withdraw_limit)
+    print(new_account.get_info())
+
+
+def withdraw_operation():
+    curr_account = find_account()
+
+    if curr_account is None:
+        return
+    
+    try:
+        value = float(input("\nWithdrawal value: "))
+    except ValueError:
+        print("\nPlease, enter a number.")
+        return
+
+    curr_account.withdraw(value)
+
+
+def deposit_operation():
+    curr_account = find_account()
+
+    if curr_account is None:
+        return
+
+    try:
+        value = float(input("\nDeposit value: "))
+    except ValueError:
+        print("\nPlease, enter a number.")
+        return
+
+    curr_account.deposit(value)
+
+
+def display_statement():
+    curr_account = find_account()
+
+    if curr_account is None:
+        return
+    
+    curr_account.history.display_transactions()
+    print()
+
+
+def find_account():
+    customer_exists = False
+    account_exists = False
+    curr_customer = None
+    curr_account = None
+
+    customer_cpf = input("\nEnter user's CPF: ")
+    for customer in Customer.customers:
+            if customer_cpf == customer.cpf:
+                customer_exists = True
+                curr_customer = customer
+    if not customer_exists:
+        print("\nUser not found.")
+        return
+    
+    try:
+        customer_account = int(input("\nEnter account's number: "))
+    except ValueError:
+        print("\nInvalid value.")
+        return
+    for account in curr_customer._accounts:
+            if customer_account == account.number:
+                account_exists = True
+                curr_account = account
+    if not account_exists:
+        print("\nAccount not found.")
+        return
+    
+    return curr_account
+
+
+main()

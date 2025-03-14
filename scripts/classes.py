@@ -15,6 +15,7 @@ class History:
         for transaction in self._transactions:
             print(transaction)
 
+
     @property
     def transactions(self):
         return self._transactions
@@ -166,25 +167,19 @@ Withdraw limit: {self._withdraw_limit}'''
 
         if self._last_transaction_time is None:
             self._last_transaction_time = current_time
-
         if not self.transaction_available(current_time):
             return
-        
         if value > self._withdraw_limit:
             print("\nWithdrawal unavailable: value surpasses withdraw limit.")
             return
-        
         if value > self._balance:
             print("\nWithdrawal unavailable: insufficient balance.")
             return
-        
         self._balance -= value
         self._num_transactions += 1
         self.history.add_transaction(f"Withdrawal: R$ {value:.2f} at {current_time}")
-
         if self._num_transactions == 1:
             self._last_transaction_time = current_time
-
 
 
     def deposit(self, value: float):
@@ -215,3 +210,5 @@ Withdraw limit: {self._withdraw_limit}'''
             else:
                 print("Deposit unavailable: you reached you daily limit.")
                 return False
+        else:
+            return True

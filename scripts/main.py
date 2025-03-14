@@ -4,17 +4,17 @@ from classes import *
 def main():
     while True:
         print('''
-    Choose an action:
-    [1] Register
-    [2] Create account
-    [3] Withdraw
-    [4] Deposit
-    [5] View statement
-    [6] View user information
-    [7] View account information
-    [8] Quit
+Choose an action:
+[1] Register
+[2] Create account
+[3] Withdraw
+[4] Deposit
+[5] View statement
+[6] View user information
+[7] View account information
+[8] Quit
 
-    Insert the number that corresponds to the desired action:
+Insert the number that corresponds to the desired action:
     ''', end="")
 
         while True:
@@ -157,7 +157,7 @@ def display_statement():
     print()
 
 
-def find_account():
+def find_account() -> CheckingAccount:
     customer_exists = False
     account_exists = False
     curr_customer = None

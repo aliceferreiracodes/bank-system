@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as f:
     page_description = f.read()
 
 setup(
-    name="bank_system",
+    name="bank_system-aliceferreiracodes",
     version="0.0.1",
     author="aliceferreiracodes",
     description="A bank system using Python",

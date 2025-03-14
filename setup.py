@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
-with open("README.md", "r") as f:
-    page_description = f.read
+with open("README.md", "r", encoding="utf-8") as f:
+    page_description = f.read()
 
 setup(
     name="bank_system",
